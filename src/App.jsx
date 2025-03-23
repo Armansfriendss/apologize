@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-route
 import LocomotiveScroll from 'locomotive-scroll';
 import 'locomotive-scroll/dist/locomotive-scroll.css';
 import VideoPlayer from './components/VideoPlayer';
+import afreenAudio from './assets/Afreen Afreencutted.mp3';
 
 // Heart Loader Component
 const HeartLoader = () => (
@@ -311,10 +312,84 @@ const MouseBlob = () => {
   );
 };
 
+// Audio Control Component
+const AudioControl = ({ isPlaying, onTogglePlay }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="fixed bottom-8 right-8 z-50"
+    >
+      {/* Tooltip */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1 }}
+        className="absolute right-16 top-1/2 -translate-y-1/2 bg-white text-gray-800 px-4 py-2 rounded-lg shadow-lg whitespace-nowrap"
+      >
+        <span className="text-sm font-medium">Click to play music</span>
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-2 h-2 bg-white transform rotate-45" />
+      </motion.div>
+
+      {/* Play Button */}
+      <motion.button
+        className="bg-pink-500 hover:bg-pink-600 text-white rounded-full p-4 shadow-lg transition-all duration-300 hover:scale-110 relative"
+        onClick={onTogglePlay}
+        animate={{
+          scale: [1, 1.1, 1],
+          boxShadow: [
+            "0 0 0 0 rgba(236, 72, 153, 0.4)",
+            "0 0 0 10px rgba(236, 72, 153, 0)",
+            "0 0 0 0 rgba(236, 72, 153, 0.4)"
+          ]
+        }}
+        transition={{
+          duration: 2,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      >
+        {isPlaying ? (
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        ) : (
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        )}
+      </motion.button>
+    </motion.div>
+  );
+};
+
 function AppContent() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef(null);
+  const navigate = useNavigate();
   const scrollRef = useRef(null);
 
   useEffect(() => {
+    // Initialize audio
+    audioRef.current = new Audio(afreenAudio);
+    audioRef.current.loop = true; // Loop the song
+
+    // Try to play on window load
+    const handleWindowLoad = async () => {
+      try {
+        await audioRef.current.play();
+        setIsPlaying(true);
+      } catch (error) {
+        console.log("Audio playback failed:", error);
+      }
+    };
+
+    window.addEventListener('load', handleWindowLoad);
+
     let scroll;
     try {
       scroll = new LocomotiveScroll({
@@ -333,13 +408,30 @@ function AppContent() {
     }
 
     return () => {
+      window.removeEventListener('load', handleWindowLoad);
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
       if (scroll) scroll.destroy();
     };
   }, []);
 
+  const togglePlay = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
   return (
     <div ref={scrollRef} data-scroll-container className="bg-gradient-to-b from-pink-50 to-white">
       <MouseBlob />
+      <AudioControl isPlaying={isPlaying} onTogglePlay={togglePlay} />
       {/* Hero Section */}
       <section className="section relative min-h-screen flex items-center justify-center overflow-hidden">
         <FloatingHearts />
