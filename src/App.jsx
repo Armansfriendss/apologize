@@ -112,7 +112,7 @@ const StoryItem = ({ image, title, description, isVideo = false, videoId }) => {
                   <video
                     src={image}
                     className="w-full h-full"
-                    poster="/images/t2.jpg"
+                    poster="/images/Fall1.jpg"
                     preload="metadata"
                     style={{ maxHeight: '500px' }}
                   />
