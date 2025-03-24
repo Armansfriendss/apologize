@@ -452,7 +452,7 @@ function AppContent() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-2xl text-gray-600 max-w-2xl mx-auto mb-8"
           >
-            This is My Apology and a cute gift for you. I know you will love it. and please forgive me for my mistakes. I will always be there for you.
+            This is My Apology and a cute gift for you from your best friend Arman. I know you will love it. and please forgive me for my mistakes. I will always be there for you.
           </motion.p>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
